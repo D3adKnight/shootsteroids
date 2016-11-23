@@ -1,0 +1,11 @@
+{
+  "name": "shootsteroids",
+  "description": "simple multiplayer space shooter arena",
+  "author": "Dead Knight",
+  "license": "MIT",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "^4.14.0",
+    "socket.io": "^1.6.0"
+  }
+}
