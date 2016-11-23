@@ -1857,12 +1857,12 @@
 		},
 		"playerShip1_red.png": {
 			"name": "playerShip1_red.png",
-			"sx": "224",
-			"sy": "832",
-			"w": "99",
-			"h": "75",
-			"tilew": "99",
-			"tileh": "75"
+			"sx": 224,
+			"sy": 832,
+			"w": 99,
+			"h": 75,
+			"tilew": 99,
+			"tileh": 75
 		},
 		"playerShip2_blue.png": {
 			"name": "playerShip2_blue.png",
@@ -1920,12 +1920,12 @@
 		},
 		"playerShip2_red.png": {
 			"name": "playerShip2_red.png",
-			"sx": "0",
-			"sy": "941",
-			"w": "112",
-			"h": "75",
-			"tilew": "112",
-			"tileh": "75"
+			"sx": 0,
+			"sy": 941,
+			"w": 112,
+			"h": 75,
+			"tilew": 112,
+			"tileh": 75
 		},
 		"playerShip3_blue.png": {
 			"name": "playerShip3_blue.png",

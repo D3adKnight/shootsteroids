@@ -99,8 +99,6 @@ let assets = {
             this[imageSource] = image;
 
             Object.keys(file.sprites).forEach(sprite => {
-                console.log(sprite);
-
                 this[sprite] = file.sprites[sprite];
                 this[sprite].source = image;
             });
@@ -118,4 +116,118 @@ let assets = {
 
         loadHandler();
     }
+}
+
+function contain(sprite, bounds, bounce = false, extra = undefined) {
+    let x = bounds.x,
+        y = bounds.y,
+        width = bounds.width,
+        height = bounds.height;
+
+    let collision;
+
+    if(sprite.x < x) {
+        if(bounce) sprite.vx *= -1;
+        if(sprite.mass) sprite.vx /= sprite.mass;
+
+        sprite.x = x;
+        collision = "left";
+    }
+
+    if(sprite.y < y) {
+        if(bounce) sprite.vy *= -1;
+        if(sprite.mass) sprite.vy /= sprite.mass;
+
+        sprite.y = y;
+        collision = "top";
+    }
+
+    if(sprite.x + sprite.width > width) {
+        if(bounce) sprite.vx *= -1;
+        if(sprite.mass) sprite.vx /= sprite.mass;
+
+        sprite.x = width - sprite.width;
+        collision = "right";
+    }
+
+    if(sprite.y + sprite.height > height) {
+        if(bounce) sprite.vy *= -1;
+        if(sprite.mass) sprite.vy /= sprite.mass;
+
+        sprite.y = height - sprite.height;
+        collision = "bottom";
+    }
+
+    if(collision && extra) extra(collision);
+
+    return collision;
+}
+
+function capturePreviousPositions(stage) {
+    stage.children.forEach(sprite => {
+        setPreviousPosition(sprite);
+    });
+
+    function setPreviousPosition(sprite) {
+        sprite.previousX = sprite.x;
+        sprite.previousY = sprite.y;
+
+        if(sprite.children && sprite.children.length > 0) {
+            sprite.children.forEach(child => {
+                setPreviousPosition(child);
+            });
+        }
+    }
+}
+
+function distance(s1, s2) {
+    let vx = s2.centerX - s1.centerX,
+        vy = s2.centerY - s1.centerY;
+    
+    return Math.sqrt(vx * vx + vy * vy);
+}
+
+function followEase(follower, leader, speed) {
+    let vx = leader.centerX - follower.centerX,
+        vy = leader.centerY - follower.centerY,
+        distance = Math.sqrt(vx * vx + vy * vy);
+    if(distance >= 1) {
+        follower.x += vx * speed;
+        follower.y += vy * speed;
+    }
+}
+
+function followConstant(follower, leader, speed) {
+    let vx = leader.centerX - follower.centerX,
+        vy = leader.centerY - follower.centerY,
+        distance = Math.sqrt(vx * vx + vy * vy);
+    if(distance >= speed) {
+        follower.x += (vx / distance) * speed;
+        follower.y += (vy / distance) * speed;
+    }
+}
+
+function angle(s1, s2) {
+    return Math.atan2(
+        s2.centerX - s1.centerX,
+        s2.centerY - s1.centerY
+    );
+}
+
+function rotateSprite(rotatingSprite, centerSprite, distance, angle) {
+    rotatingSprite.x = centerSprite.centerX - rotatingSprite.parent.x
+                        + (distance * Math.cos(angle))
+                        - rotatingSprite.halfWidth;
+    rotatingSprite.y = centerSprite.centerY - rotatingSprite.parent.y
+                        + (distance * Math.sin(angle))
+                        - rotatingSprite.halfWidth;
+}
+
+function rotatePoint(pointX, pointY, distanceX, distanceY, angle) {
+    let point = {};
+
+    point.x = pointX + Math.cos(angle) * distanceX;
+    point.y = pointY + Math.sin(angle) * distanceY;
+
+    return point;
 }

@@ -2,91 +2,90 @@
     Init globals
 */
 let canvas = makeCanvas(512, 512);
-let stage = new DisplayObject();
 stage.width = canvas.width;
 stage.height = canvas.height;
 
-function makeCanvas(
-    width = 256, height = 256,
-    border = "1px dashed black",
-    backgroundColor = "white"
-) {
-    let canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    canvas.style.border = border;
-    canvas.style.backgroundColor = backgroundColor;
-    document.body.appendChild(canvas);
+let fps = 30,
+    previous = 0,
+    lag = 0,
+    frameDuration = 1000 / fps;
 
-    canvas.ctx = canvas.getContext("2d");
+let ship;
+let hor_speed = 5;
 
-    return canvas;
+assets.load(["/assets/sprites/sheet.json"])
+.then(() => setup());
+
+function setup() {
+    ship = sprite(assets["playerShip1_red.png"], 256, 256);
+    
+    stage.putCenter(ship);
+
+    ship.vx = 0;
+    ship.vy = 0;
+    ship.accelerationX = 0.2;
+    ship.accelerationY = 0.2;
+    ship.frictionX = 0.96;
+    ship.frictionY = 0.96;
+
+    ship.rotationSpeed = 0;
+
+    ship.moveForward = false;
+
+    let leftArrow = keyboard(37),
+        rightArrow = keyboard(39),
+        upArrow = keyboard(38);
+
+    leftArrow.press = () => ship.rotationSpeed = -0.1;
+    leftArrow.release = () => {
+        if(!rightArrow.isDown) ship.rotationSpeed = 0;
+    };
+    rightArrow.press = () => ship.rotationSpeed = 0.1;
+    rightArrow.release = () => {
+        if(!leftArrow.isDown) ship.rotationSpeed = 0;
+    };
+
+    upArrow.press = () => ship.moveForward = true;
+    upArrow.release = () => ship.moveForward = false;
+
+    gameLoop();
 }
 
-function render(canvas) {
-    let ctx = canvas.ctx;
+function update() {
+    ship.rotation += ship.rotationSpeed;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    stage.children.forEach(sprite => {
-        displaySprite(sprite);
-    });
-
-    function displaySprite(sprite) {
-        if(
-            sprite.visible
-            && sprite.gx < canvas.width + sprite.width
-            && sprite.gx + sprite.width >= -sprite.width
-            && sprite.gy < canvas.height + sprite.height
-            && sprite.gy + sprite.height >= -sprite.height
-        ) {
-            ctx.save();
-
-            ctx.translate(
-                sprite.x + (sprite.width * sprite.pivotX),
-                sprite.y + (sprite.height * sprite.pivotY)
-            );
-
-            ctx.rotate(sprite.rotation);
-            ctx.globalAlpha = sprite.alpha * sprite.parent.alpha;
-            ctx.scale(sprite.scaleX, sprite.scaleY);
-
-            if(sprite.shadow) {
-                ctx.shadowColor = sprite.shadowColor;
-                ctx.shadowOffsetX = sprite.shadowOffsetX;
-                ctx.shadowOffsetY = sprite.shadowOffsetY;
-                ctx.shadowBlur = sprite.shadowBlur;
-            }
-
-            if(sprite.blendMode) ctx.globalCompositeOperation = sprite.blendMode;
-
-            if(sprite.render)
-                sprite.render(ctx);
-
-            if(sprite.children && sprite.children.length > 0) {
-                ctx.translate(-sprite.width * sprite.pivotX, -sprite.height * sprite.pivotY);
-
-                sprite.children.forEach(child => {
-                    displaySprite(child);
-                });
-            }
-
-            ctx.restore();
-        }
+    if(ship.moveForward) {
+        ship.vx += ship.accelerationX * Math.cos(ship.rotation);
+        ship.vy += ship.accelerationY * Math.sin(ship.rotation);
+    } else {
+        ship.vx *= ship.frictionX;
+        ship.vy *= ship.frictionY;
     }
+
+    ship.x += ship.vx;
+    ship.y += ship.vy;
+
+    contain(ship, stage.localBounds);
 }
 
-assets.load(["/assets/sprites/sheet.json"]);
+function gameLoop(timestamp) {
+    requestAnimationFrame(gameLoop);
 
-let blueBox = rectangle(64, 64, "blue", "none", 0, 32, 32);
-blueBox.rotation = 0.2;
+    if(!timestamp) timestamp = 0;
+    let elapsed = timestamp - previous;
 
-let redBox = rectangle(64, 64, "red", "black", 4, 160, 100);
-redBox.alpha = 0.5;
-redBox.scaleY = 2;
+    if(elapsed > 1000) elapsed = frameDuration;
+    lag += elapsed;
 
-let greenBox = rectangle(64, 64, "yellowGreen", "black", 2, 50, 150);
-greenBox.scaleX = 0.5;
-greenBox.rotation = 0.8;
+    while (lag >= frameDuration) {
+        capturePreviousPositions(stage);
+        update();
 
-render(canvas, ctx);
+        lag -= frameDuration;
+    }
+
+    let lagOffset = lag / frameDuration;
+    renderWithInterpolation(canvas, lagOffset);
+
+    previous = timestamp;
+}
