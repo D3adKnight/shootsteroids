@@ -1,0 +1,13 @@
+@font-face {
+    font-family: Kenvector Future;
+    src: url("/fonts/kenvector_future.ttf");
+}
+
+@font-face {
+    font-family: Kenvector Future Thin;
+    src: url("/fonts/kenvector_future_thin.ttf");
+}
+
+body {
+    font-family: Kenvector Future;
+}

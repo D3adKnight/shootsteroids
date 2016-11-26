@@ -10,6 +10,9 @@ for(let code in KEY_CODES) {
     KEY_STATUS[KEY_CODES[code]] = false;
 }
 
+var socket = io();
+var uiPlayers = document.getElementById("players");
+
 let canvas = document.getElementById("game");
 let ctx = canvas.getContext('2d');
 
@@ -29,9 +32,12 @@ let ship;
 let bg_offset_x = 0;
 let bg_offset_y = 0;
 
-function createShip(img, x, y, width, height) {
+let players = [];
+function createShip(socket, img, x, y, width, height) {
     let self = new Sprite(img, x, y, width, height);
 
+    self.socket = socket;
+    self.id = socket.id;
     // add ship-only props
     self.vx = 0;
     self.vy = 0;
@@ -68,10 +74,7 @@ function createAsteroid(x, y, vx, vy) {
 
     self.update = function() {
         self.rotation += self.rotationSpeed;
-/*
-        self.vx += self.acceleration;
-        self.vy += self.acceleration;
-*/
+
         self.x += self.vx;
         self.y += self.vy;
     };
@@ -82,13 +85,33 @@ function createAsteroid(x, y, vx, vy) {
 }
 
 function setup() {
-    let ship_img = tilesheet["playerShip2_red.png"];
-    let ship_w = ship_img.w * 0.5;
-    let ship_h = ship_img.h * 0.5;
-    let ship_x = (canvas.width - ship_w) * 0.5;
-    let ship_y = (canvas.height - ship_h) * 0.5;
+    let createPlayer = (socket) => {
+        let ship_img = tilesheet["playerShip2_red.png"];
+        let ship_w = ship_img.w * 0.5;
+        let ship_h = ship_img.h * 0.5;
+        let ship_x = (canvas.width - ship_w) * 0.5;
+        let ship_y = (canvas.height - ship_h) * 0.5;
+        
+        ship = createShip(socket, ship_img, ship_x, ship_y, ship_w, ship_h);
+        ship.socket = socket;
+
+        return ship;
+    };
+
+    socket.on("connected", function(data){
+        socket.id = data['playerId'];
+        let player = createPlayer(socket);
+        players.push(player);
+    });
     
-    ship = createShip(ship_img, ship_x, ship_y, ship_w, ship_h);
+    self.socket.on("positions", function(data){
+        for(var i = 0; i < data.length; i++) {
+            if(players.length > 0) {
+                players[i].x = data[i].x;
+                players[i].y = data[i].y;
+            }
+        }
+    });
 
     createAsteroid(0, 0, -2, -2);
     createAsteroid(canvas.width, canvas.height, 2, 2);
@@ -134,8 +157,11 @@ function render() {
         ctx.restore();
     };
 
-    // draw ship
-    drawSprite(ship);
+    // draw ships
+    players.forEach(player => {
+        drawSprite(player);
+    });
+    //drawSprite(ship);
 
     // draw asteroids
     asteroids.forEach(ast => {
@@ -152,22 +178,22 @@ function render() {
 
 function wrap(drawable) {
     if(drawable.x + drawable.width < 0) {
-        drawable.x = canvas.width - drawable.width;
+        drawable.x = canvas.width;
     }
     if(drawable.y + drawable.height < 0) {
-        drawable.y = canvas.height - drawable.height;
+        drawable.y = canvas.height;
     }
     if(drawable.x - drawable.width > canvas.width) {
-        drawable.x = 0;
+        drawable.x = -drawable.width;
     }
     if(drawable.y - drawable.height > canvas.height) {
-        drawable.y = 0;
+        drawable.y = -drawable.height;
     }
 }
 
 function gameLoop() {
     requestAnimationFrame(gameLoop);
-
+/*
     // update ship position
     if(KEY_STATUS.left) {
         ship.rotation -= 0.1;
@@ -181,13 +207,14 @@ function gameLoop() {
     if(ship.moveForward && !KEY_STATUS.up) {
         ship.moveForward = false;
     }
+*/
 
-    ship.update();
-    
+    //ship.update();
+    /*
     bg_offset_x += ship.vx * 0.2;
     bg_offset_y += ship.vy * 0.2;
-
-    wrap(ship);
+    */
+    //wrap(ship);
 
     asteroids.forEach(ast => {
         ast.update();
