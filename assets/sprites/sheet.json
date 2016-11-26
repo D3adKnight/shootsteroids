@@ -1380,12 +1380,12 @@
 		},
 		"meteorBrown_big1.png": {
 			"name": "meteorBrown_big1.png",
-			"sx": "224",
-			"sy": "664",
-			"w": "101",
-			"h": "84",
-			"tilew": "101",
-			"tileh": "84"
+			"sx": 224,
+			"sy": 664,
+			"w": 101,
+			"h": 84,
+			"tilew": 101,
+			"tileh": 84
 		},
 		"meteorBrown_big2.png": {
 			"name": "meteorBrown_big2.png",

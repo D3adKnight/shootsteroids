@@ -5,50 +5,96 @@ const KEY_CODES = {
     40: 'down'
 };
 
-var KEY_STATUS = {};
-for(var code in KEY_CODES) {
+let KEY_STATUS = {};
+for(let code in KEY_CODES) {
     KEY_STATUS[KEY_CODES[code]] = false;
 }
 
-var bg = new Image();
-bg.addEventListener("load", start, false);
+let canvas = document.getElementById("game");
+let ctx = canvas.getContext('2d');
+
+let bg = new Image();
+//bg.addEventListener("load", start, false);
 bg.src = "/bgs/black.png";
 
-var ship_img = new Image();
-ship_img.src = "/images/playerShip1_red.png";
-
-var canvas = document.getElementById("game");
-var ctx = canvas.getContext('2d');
+tilesheet.load("/sprites/sheet.json").then(() => start());
 
 function start() {
     setup();
     gameLoop();
 }
 
-var ship;
+let ship;
 
-var bg_offset_x = 0;
-var bg_offset_y = 0;
-var ship_w = ship_img.width / 2;
-var ship_h = ship_img.height / 2;
+let bg_offset_x = 0;
+let bg_offset_y = 0;
 
-var ship_x = 0;
-var ship_y = 0;
-var ship_vx = 0;
-var ship_vy = 0;
-var ship_rotation = 0;
-var ship_acceleration = 0.2;
-var ship_friction = 0.96;
-var ship_moveForward = false;
+function createShip(img, x, y, width, height) {
+    let self = new Sprite(img, x, y, width, height);
+
+    // add ship-only props
+    self.vx = 0;
+    self.vy = 0;
+    self.acceleration = 0.2;
+    self.friction = 0.98;
+    self.moveForward = false;
+
+    self.update = function() {
+        if(self.moveForward) {
+            self.vx += self.acceleration * Math.sin(self.rotation);
+            self.vy += -self.acceleration * Math.cos(self.rotation);
+        } else {
+            self.vx *= self.friction;
+            self.vy *= self.friction;
+        }
+
+        self.x += self.vx;
+        self.y += self.vy;
+    };
+
+    return self;
+}
+
+let asteroids = [];
+function createAsteroid(x, y, vx, vy) {
+    // TODO: add random selection
+    let img = tilesheet["meteorBrown_big1.png"];
+    let self = new Sprite(img, x, y, img.w, img.h);
+
+    self.vx = vx;
+    self.vy = vy;
+    self.acceleration = 0.02;
+    self.rotationSpeed = 0.05;
+
+    self.update = function() {
+        self.rotation += self.rotationSpeed;
+/*
+        self.vx += self.acceleration;
+        self.vy += self.acceleration;
+*/
+        self.x += self.vx;
+        self.y += self.vy;
+    };
+
+    asteroids.push(self);
+
+    return self;
+}
 
 function setup() {
-    ship_x = (canvas.width - ship_w) / 2;
-    ship_y = (canvas.height - ship_h) / 2;
+    let ship_img = tilesheet["playerShip2_red.png"];
+    let ship_w = ship_img.w * 0.5;
+    let ship_h = ship_img.h * 0.5;
+    let ship_x = (canvas.width - ship_w) * 0.5;
+    let ship_y = (canvas.height - ship_h) * 0.5;
+    
+    ship = createShip(ship_img, ship_x, ship_y, ship_w, ship_h);
 
-    ship = new Sprite(ship_img, ship_x, ship_y, ship_w, ship_h);
+    createAsteroid(0, 0, -2, -2);
+    createAsteroid(canvas.width, canvas.height, 2, 2);
 
     document.onkeydown = function(e) {
-        var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
+        let keyCode = (e.keyCode) ? e.keyCode : e.charCode;
         if(KEY_CODES[keyCode]) {
             e.preventDefault();
             KEY_STATUS[KEY_CODES[keyCode]] = true;
@@ -56,7 +102,7 @@ function setup() {
     };
 
     document.onkeyup = function(e) {
-        var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
+        let keyCode = (e.keyCode) ? e.keyCode : e.charCode;
         if(KEY_CODES[keyCode]) {
             e.preventDefault();
             KEY_STATUS[KEY_CODES[keyCode]] = false;
@@ -68,28 +114,33 @@ function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // draw background
-    var pattern = ctx.createPattern(bg, "repeat");
+    let pattern = ctx.createPattern(bg, "repeat");
     ctx.fillStyle = pattern;
 
     ctx.translate(bg_offset_x, bg_offset_y);
     ctx.fillRect(-bg_offset_x, -bg_offset_y, canvas.width, canvas.height);
     ctx.translate(-bg_offset_x, -bg_offset_y);
 
+    let drawSprite = sprite => {
+        ctx.save();
+        ctx.translate(
+            sprite.x + sprite.width * 0.5,
+            sprite.y + sprite.height * 0.5
+        );
+        ctx.rotate(sprite.rotation);
+        ctx.scale(sprite.scaleX, sprite.scaleY);
+
+        if(sprite.render) sprite.render(ctx);
+        ctx.restore();
+    };
+
     // draw ship
-    ctx.save();
-    ctx.translate(
-        ship_x + ship_w * 0.5,
-        ship_y + ship_h * 0.5
-    );
-    ctx.rotate(ship_rotation);
-    /*
-    ctx.drawImage(ship, 0, 0,
-                 ship.width, ship.height,
-                 -ship_w * 0.5, -ship_h * 0.5,
-                 ship_w, ship_h);
-    */
-    ship.render(ctx);
-    ctx.restore();
+    drawSprite(ship);
+
+    // draw asteroids
+    asteroids.forEach(ast => {
+        drawSprite(ast);
+    });
 
     ctx.fillStyle = "red";
     ctx.fillRect(
@@ -99,18 +150,18 @@ function render() {
     );
 }
 
-function wrap() {
-    if(ship_x - ship_w * 2 < 0) {
-        ship_x = canvas.width - ship_w;
+function wrap(drawable) {
+    if(drawable.x + drawable.width < 0) {
+        drawable.x = canvas.width - drawable.width;
     }
-    if(ship_y - ship_h < 0) {
-        ship_y = canvas.height - ship_h;
+    if(drawable.y + drawable.height < 0) {
+        drawable.y = canvas.height - drawable.height;
     }
-    if(ship_x + ship_w * 2 > canvas.width) {
-        ship_x = 0;
+    if(drawable.x - drawable.width > canvas.width) {
+        drawable.x = 0;
     }
-    if(ship_y + ship_h > canvas.height) {
-        ship_y = 0;
+    if(drawable.y - drawable.height > canvas.height) {
+        drawable.y = 0;
     }
 }
 
@@ -119,45 +170,30 @@ function gameLoop() {
 
     // update ship position
     if(KEY_STATUS.left) {
-        ship_rotation -= 0.1;
+        ship.rotation -= 0.1;
     }
     if(KEY_STATUS.right) {
-        ship_rotation += 0.1;
+        ship.rotation += 0.1;
     }
     if(KEY_STATUS.up) {
-        ship_moveForward = true;
+        ship.moveForward = true;
     }
-    if(ship_moveForward && !KEY_STATUS.up) {
-        ship_moveForward = false;
+    if(ship.moveForward && !KEY_STATUS.up) {
+        ship.moveForward = false;
     }
+
+    ship.update();
     
-    if(ship_moveForward) {
-        ship_vx += ship_acceleration * Math.sin(ship_rotation);
-        ship_vy += -ship_acceleration * Math.cos(ship_rotation);
-    } else {
-        ship_vx *= ship_friction;
-        ship_vy *= ship_friction;
-    }
+    bg_offset_x += ship.vx * 0.2;
+    bg_offset_y += ship.vy * 0.2;
 
-    ship_x += ship_vx;
-    ship_y += ship_vy;
+    wrap(ship);
 
-    bg_offset_x += ship_vx * 0.2;
-    bg_offset_y += ship_vy * 0.2;
-
-    wrap();
+    asteroids.forEach(ast => {
+        ast.update();
+        wrap(ast);
+    });
 
     // rendering
     render();
 }
-
-/*
-ctx.drawImage(
- this.source,
- this.sourceX, this.sourceY,
- this.sourceWidth, this.sourceHeight,
- -this.width * this.pivotX,
- -this.height * this.pivotY,
- this.width, this.height
- );
-*/
