@@ -8,7 +8,7 @@
 		
 		<script src="/js/lib/jquery-3.1.1.min.js"></script>
 		<script src="socket.io/socket.io.js"></script>
-
+<!--
 		<style>
 			.players {
 				z-index: 5;
@@ -31,28 +31,24 @@
 				width: 636px;
 			}
 		</style>
-
+-->
 	</head>
 
 	<body>
+		<!--
 		<span id="players" class="players"></span>
 		<canvas id="game" width="640" height="480"></canvas>
-		<!-- chat -->
+		
 		<div id="chat-text">
 			<p>Hello!</p>
 		</div>
 		<form id="chat-form">
 			<input id="chat-input" type="text"></input>
 		</form>
+		-->
+		<script src="/js/game.js"></script>
+		
 <!--
-		<script src="/js/src/engine/utilities.js"></script>
-		<script src="/js/src/engine/display.js"></script>
-		<script src="/js/src/engine/interactive.js"></script>
-	
-		<script src="/js/src/engine/assets.js"></script>
-		<script src="/js/src/engine/drawable.js"></script>
-		<script src="/js/src/game.js"></script>
--->
 		<script>
 			let plImage = new Image();
 			plImage.src = "/images/playerShip2_red.png";
@@ -64,7 +60,7 @@
 			let chatForm = document.getElementById("chat-form");
 
 			let ctx = document.getElementById("game").getContext("2d");
-			ctx.font = "14px kenvector_future";
+			ctx.font = "14px Kenvector Future";
 
 			let drawSprite = (image, x, y, rotation) => {
 				ctx.save();
@@ -156,5 +152,6 @@
 				}
 			};
 		</script>
+-->
 	</body>
 </html>

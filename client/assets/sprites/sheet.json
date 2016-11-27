@@ -1290,12 +1290,12 @@
 		},
 		"laserRed07.png": {
 			"name": "laserRed07.png",
-			"sx": "856",
-			"sy": "131",
-			"w": "9",
-			"h": "37",
-			"tilew": "9",
-			"tileh": "37"
+			"sx": 856,
+			"sy": 131,
+			"w": 9,
+			"h": 37,
+			"tilew": 9,
+			"tileh": 37
 		},
 		"laserRed08.png": {
 			"name": "laserRed08.png",

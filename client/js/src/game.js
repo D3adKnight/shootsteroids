@@ -1,226 +1,207 @@
-const KEY_CODES = {
-    37: 'left',
-    38: 'up',
-    39: 'right',
-    40: 'down'
-};
+import {makeCanvas, remove, render}  from "./engine/display";
+import {stage, sprite, text, background} from "./engine/display";
+import {particles, particleEffect} from "./engine/display";
+import {assets, wrap, outsideBounds} from "./engine/utilities";
+import {randomInt, randomFloat} from "./engine/utilities";
+import {keyboard, makePointer} from "./engine/interactive";
+import {movingCircleCollision, circleRectangleCollision} from "./engine/collision";
 
-let KEY_STATUS = {};
-for(let code in KEY_CODES) {
-    KEY_STATUS[KEY_CODES[code]] = false;
-}
+assets.load([
+    "bgs/darkPurple.png",
+    "fonts/kenvector_future_thin.ttf",
+    "sounds/sfx_laser1.mp3",
+    "sprites/sheet.json"
+]).then(() => setup());
 
-var socket = io();
-var uiPlayers = document.getElementById("players");
-
-let canvas = document.getElementById("game");
-let ctx = canvas.getContext('2d');
-
-let bg = new Image();
-//bg.addEventListener("load", start, false);
-bg.src = "/bgs/black.png";
-
-tilesheet.load("/sprites/sheet.json").then(() => start());
-
-function start() {
-    setup();
-    gameLoop();
-}
-
-let ship;
-
-let bg_offset_x = 0;
-let bg_offset_y = 0;
-
-let players = [];
-function createShip(socket, img, x, y, width, height) {
-    let self = new Sprite(img, x, y, width, height);
-
-    self.socket = socket;
-    self.id = socket.id;
-    // add ship-only props
-    self.vx = 0;
-    self.vy = 0;
-    self.acceleration = 0.2;
-    self.friction = 0.98;
-    self.moveForward = false;
-
-    self.update = function() {
-        if(self.moveForward) {
-            self.vx += self.acceleration * Math.sin(self.rotation);
-            self.vy += -self.acceleration * Math.cos(self.rotation);
-        } else {
-            self.vx *= self.friction;
-            self.vy *= self.friction;
-        }
-
-        self.x += self.vx;
-        self.y += self.vy;
-    };
-
-    return self;
-}
-
+let canvas, ship, message, shootSfx, bg;
+let bullets = [];
 let asteroids = [];
-function createAsteroid(x, y, vx, vy) {
-    // TODO: add random selection
-    let img = tilesheet["meteorBrown_big1.png"];
-    let self = new Sprite(img, x, y, img.w, img.h);
+let pointer;
 
-    self.vx = vx;
-    self.vy = vy;
-    self.acceleration = 0.02;
-    self.rotationSpeed = 0.05;
+let score = 0;
 
-    self.update = function() {
-        self.rotation += self.rotationSpeed;
+function shoot(
+            shooter, angle, offsetFromCenter,
+            bulletSpeed, bulletsArray, bulletSprite) {
+    let bullet = bulletSprite();
 
-        self.x += self.vx;
-        self.y += self.vy;
-    };
+    bullet.x = shooter.centerX - bullet.halfWidth + (offsetFromCenter * Math.cos(angle));
+    bullet.y = shooter.centerY - bullet.halfHeight + (offsetFromCenter * Math.sin(angle));
 
-    asteroids.push(self);
+    bullet.vx = Math.sin(angle) * bulletSpeed;
+    bullet.vy = -Math.cos(angle) * bulletSpeed;
 
-    return self;
+    bullet.rotation = angle;
+
+    bulletsArray.push(bullet);
+
+    particleEffect(bullet.x, bullet.y);
+    shootSfx.play();
+}
+
+function spawnAsteroid() {
+    let x = randomInt(0, stage.localBounds.width),
+        y = randomInt(0, stage.localBounds.height);
+
+    let asteroid = sprite(assets["meteorBrown_big1.png"], x, y);
+    asteroid.circular = true;
+    asteroid.diameter = 90;
+    
+    asteroid.vx = randomFloat(-5, 5);
+    asteroid.vy = randomFloat(-5, 5);
+
+    asteroid.rotationSpeed = randomFloat(0.01, 0.07);
+
+    asteroids.push(asteroid);
 }
 
 function setup() {
-    let createPlayer = (socket) => {
-        let ship_img = tilesheet["playerShip2_red.png"];
-        let ship_w = ship_img.w * 0.5;
-        let ship_h = ship_img.h * 0.5;
-        let ship_x = (canvas.width - ship_w) * 0.5;
-        let ship_y = (canvas.height - ship_h) * 0.5;
-        
-        ship = createShip(socket, ship_img, ship_x, ship_y, ship_w, ship_h);
-        ship.socket = socket;
+    canvas = makeCanvas(1280, 720, "none");
+    stage.width = canvas.width;
+    stage.height = canvas.height;
 
-        return ship;
-    };
+    pointer = makePointer(canvas);
+    shootSfx = assets["sounds/sfx_laser1.mp3"];
 
-    socket.on("connected", function(data){
-        socket.id = data['playerId'];
-        let player = createPlayer(socket);
-        players.push(player);
-    });
-    
-    self.socket.on("positions", function(data){
-        for(var i = 0; i < data.length; i++) {
-            if(players.length > 0) {
-                players[i].x = data[i].x;
-                players[i].y = data[i].y;
-            }
-        }
-    });
+    bg = background(assets["bgs/darkPurple.png"], canvas.width, canvas.height);
 
-    createAsteroid(0, 0, -2, -2);
-    createAsteroid(canvas.width, canvas.height, 2, 2);
+    ship = sprite(assets["playerShip2_red.png"]);
+    ship.scaleX = 0.5;
+    ship.scaleY = 0.5;
+    stage.putCenter(ship);
 
-    document.onkeydown = function(e) {
-        let keyCode = (e.keyCode) ? e.keyCode : e.charCode;
-        if(KEY_CODES[keyCode]) {
-            e.preventDefault();
-            KEY_STATUS[KEY_CODES[keyCode]] = true;
-        }
-    };
+    ship.vx = 0;
+    ship.vy = 0;
+    ship.accelerationX = 0.2;
+    ship.accelerationY = 0.2;
+    ship.friction = 0.96;
+    ship.speed = 0;
 
-    document.onkeyup = function(e) {
-        let keyCode = (e.keyCode) ? e.keyCode : e.charCode;
-        if(KEY_CODES[keyCode]) {
-            e.preventDefault();
-            KEY_STATUS[KEY_CODES[keyCode]] = false;
-        }
-    };
-}
+    ship.rotationSpeed = 0;
 
-function render() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ship.moveForward = false;
 
-    // draw background
-    let pattern = ctx.createPattern(bg, "repeat");
-    ctx.fillStyle = pattern;
+    ship.lives = 3;
+    ship.destroyed = false;
 
-    ctx.translate(bg_offset_x, bg_offset_y);
-    ctx.fillRect(-bg_offset_x, -bg_offset_y, canvas.width, canvas.height);
-    ctx.translate(-bg_offset_x, -bg_offset_y);
+    let leftArrow = keyboard(37),
+        rightArrow = keyboard(39),
+        upArrow = keyboard(38),
+        space = keyboard(32);
 
-    let drawSprite = sprite => {
-        ctx.save();
-        ctx.translate(
-            sprite.x + sprite.width * 0.5,
-            sprite.y + sprite.height * 0.5
+    leftArrow.press = () => ship.rotationSpeed = -0.1;
+    leftArrow.release = () => {
+        if(!rightArrow.isDown) ship.rotationSpeed = 0;
+    }
+
+    rightArrow.press = () => ship.rotationSpeed = 0.1;
+    rightArrow.release = () => {
+        if(!leftArrow.isDown) ship.rotationSpeed = 0;
+    }
+
+    upArrow.press = () => ship.moveForward = true;
+    upArrow.release = () => ship.moveForward = false;
+
+    space.press = () => {
+        shoot(
+            ship, ship.rotation, 14, 10, bullets,
+            () => sprite(assets["laserRed07.png"])
         );
-        ctx.rotate(sprite.rotation);
-        ctx.scale(sprite.scaleX, sprite.scaleY);
-
-        if(sprite.render) sprite.render(ctx);
-        ctx.restore();
-    };
-
-    // draw ships
-    players.forEach(player => {
-        drawSprite(player);
-    });
-    //drawSprite(ship);
-
-    // draw asteroids
-    asteroids.forEach(ast => {
-        drawSprite(ast);
-    });
-
-    ctx.fillStyle = "red";
-    ctx.fillRect(
-        canvas.width * 0.5 - 2,
-        canvas.height * 0.5 - 2,
-        4, 4
-    );
-}
-
-function wrap(drawable) {
-    if(drawable.x + drawable.width < 0) {
-        drawable.x = canvas.width;
+        shoot(
+            ship, ship.rotation, -14, 10, bullets,
+            () => sprite(assets["laserRed07.png"])
+        );
     }
-    if(drawable.y + drawable.height < 0) {
-        drawable.y = canvas.height;
+
+    message = text("Hello!", "16px kenvector_future_thin", "white", 8, 8);
+
+    for(let i = 0; i < 5; i++){
+        spawnAsteroid();
     }
-    if(drawable.x - drawable.width > canvas.width) {
-        drawable.x = -drawable.width;
-    }
-    if(drawable.y - drawable.height > canvas.height) {
-        drawable.y = -drawable.height;
-    }
+
+    gameLoop();
 }
 
 function gameLoop() {
     requestAnimationFrame(gameLoop);
-/*
-    // update ship position
-    if(KEY_STATUS.left) {
-        ship.rotation -= 0.1;
-    }
-    if(KEY_STATUS.right) {
-        ship.rotation += 0.1;
-    }
-    if(KEY_STATUS.up) {
-        ship.moveForward = true;
-    }
-    if(ship.moveForward && !KEY_STATUS.up) {
-        ship.moveForward = false;
-    }
-*/
 
-    //ship.update();
-    /*
-    bg_offset_x += ship.vx * 0.2;
-    bg_offset_y += ship.vy * 0.2;
-    */
-    //wrap(ship);
+    if(particles.length > 0) {
+        particles.forEach(particle => {
+            particle.update();
+        });
+    }
 
-    asteroids.forEach(ast => {
-        ast.update();
-        wrap(ast);
+    bullets = bullets.filter(bullet => {
+        bullet.x += bullet.vx;
+        bullet.y += bullet.vy;
+
+        let collision = outsideBounds(bullet, stage.localBounds);
+
+        if(collision) {
+            remove(bullet);
+            return false;
+        }
+
+        return true;
     });
 
-    // rendering
-    render();
+    for(let i = 0; i < asteroids.length; i++) {
+        let a1 = asteroids[i];
+
+        // update asteroid
+        a1.rotation += a1.rotationSpeed;
+        a1.x += a1.vx;
+        a1.y += a1.vy;
+
+        wrap(a1, stage.localBounds);
+
+        // check collisisons
+        // between asteroids
+        for(let j = i + 1; j < asteroids.length; j++) {
+            let a2 = asteroids[j];
+
+            movingCircleCollision(a1, a2);
+        }
+        // and with player
+        let playerHit = circleRectangleCollision(a1, ship, true);
+        if(playerHit) {
+            ship.lives -= 1;
+            // destroy ship
+            ship.destroyed = true;
+            //stage.removeChild(ship);
+            particleEffect(ship.x, ship.y);
+
+            // respawn ship
+            setTimeout(() => {
+                //stage.addChild(ship);
+                stage.putCenter(ship);
+                ship.rotation = 0;
+                ship.destroyed = false;
+            }, 1000);
+        }
+    }
+    
+    if(!ship.destroyed) {
+        ship.rotation += ship.rotationSpeed;
+        
+        if(ship.moveForward) {
+            ship.vx += ship.accelerationX * Math.sin(ship.rotation);
+            ship.vy += -ship.accelerationY * Math.cos(ship.rotation);
+        } else {
+            ship.vx *= ship.friction;
+            ship.vy *= ship.friction;
+        }
+
+        ship.x += ship.vx;
+        ship.y += ship.vy;
+
+        wrap(ship, stage.localBounds);
+    }
+
+    bg.x -= Math.floor(ship.vx);
+    bg.y -= Math.floor(ship.vy);
+
+    message.content = "Scores: " + score;
+
+    render(canvas);
 }

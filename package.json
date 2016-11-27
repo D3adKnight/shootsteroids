@@ -12,5 +12,14 @@
     "ejs": "^2.5.2",
     "express": "^4.14.0",
     "socket.io": "^1.6.0"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.18.0",
+    "babelify": "^7.3.0",
+    "browserify": "latest",
+    "gulp": "latest",
+    "gulp-util": "^3.0.7",
+    "vinyl-source-stream": "latest",
+    "watchify": "latest"
   }
 }
