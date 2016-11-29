@@ -12,8 +12,6 @@ let sourceFile = './client/src/js/game.js'
 let destFolder = './public/js/'
 let destFile = 'game.js'
 
-let node
-
 gulp.task('lint', () => {
   return gulp.src([
     './client/src/js/**/*.js',
@@ -26,13 +24,44 @@ gulp.task('lint', () => {
 })
 
 gulp.task('test-server', () => {
-  return gulp.src('./tests/server/**/*.js')
-    .pipe(mocha())
+  // return gulp.src('./tests/server/**/*.js')
+  //    .pipe(mocha())
+  return gulp.src([
+    'main.js',
+    './server/**/*.js',
+    './client/shared/**/*.js'
+  ])
+      .pipe(istanbul({includeUntested: true}))
+      .on('finish', () => {
+        gulp.src([
+          './tests/server/**/*.js',
+          './tests/client/**/*.js'
+        ])
+        .pipe(mocha({reporter: 'spec'}))
+        .pipe(istanbul.writeReports({
+          dir: './tests/coverage/server',
+          reporters: ['lcov'],
+          reportOpts: {dir: './tests/coverage/server'}
+        }))
+      })
 })
 
 gulp.task('test-client', () => {
-  return gulp.src('./tests/client/**/*.js')
-    .pipe(mocha())
+  // return gulp.src('./tests/client/**/*.js')
+  //  .pipe(mocha())
+  return gulp.src('./client/**/*.js')
+      .pipe(istanbul({includeUntested: true}))
+      .on('finish', () => {
+        gulp.src([
+          './tests/client/**/*.js'
+        ])
+        .pipe(mocha({reporter: 'spec'}))
+        .pipe(istanbul.writeReports({
+          dir: './tests/coverage/client',
+          reporters: ['lcov'],
+          reportOpts: {dir: './tests/coverage/client'}
+        }))
+      })
 })
 
 gulp.task('test', ['test-server', 'test-client'])

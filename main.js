@@ -5,6 +5,8 @@ let app = express()
 let server = require('http').Server(app)
 let io = require('socket.io')(server)
 
+let test = require('server/test_module')
+
 app.use(express.static(path.join(__dirname, '/public')))
 app.use(express.static(path.join(__dirname, '/public/assets')))
 
@@ -18,6 +20,7 @@ app.get('/', function (req, res) {
 
 server.listen(3000)
 console.log('Server listening on port 3000')
+console.log(test())
 /*
 // multiplayer support
 let SOKET_LIST = {}
