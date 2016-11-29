@@ -22,7 +22,5 @@
         "constructor-super": "warn",
         "valid-typeof": "warn"
     },
-    "globals": {
-        "Quintus": true
-    }
+    "extends": "standard"
 }

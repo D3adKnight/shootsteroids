@@ -13,7 +13,6 @@ assets.load([
 let canvas, ship, message, shootSfx, bg
 let bullets = []
 let asteroids = []
-//  let pointer
 
 let score = 0
 
@@ -57,7 +56,6 @@ function setup () {
   stage.width = canvas.width
   stage.height = canvas.height
 
-  //  pointer = makePointer(canvas)
   shootSfx = assets['sounds/sfx_laser1.mp3']
 
   bg = background(assets['bgs/darkPurple.png'], canvas.width, canvas.height)
