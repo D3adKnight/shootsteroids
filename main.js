@@ -1,8 +1,9 @@
+let path = require('path')
+
 let express = require('express')
 let app = express()
 let server = require('http').Server(app)
 let io = require('socket.io')(server)
-let path = require('path')
 
 app.use(express.static(path.join(__dirname, '/public')))
 app.use(express.static(path.join(__dirname, '/public/assets')))
@@ -17,7 +18,7 @@ app.get('/', function (req, res) {
 
 server.listen(3000)
 console.log('Server listening on port 3000')
-
+/*
 // multiplayer support
 let SOKET_LIST = {}
 
@@ -220,3 +221,4 @@ setInterval(() => {
     socket.emit('positions', pack)
   })
 }, 1000 / 25) // 25fps server tick
+*/

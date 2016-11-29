@@ -15,7 +15,8 @@
             "type": "node",
             "request": "attach",
             "name": "Подключиться к процессу",
-            "port": 3000
+            "port": 5858,
+            "restart": false
         }
     ]
 }

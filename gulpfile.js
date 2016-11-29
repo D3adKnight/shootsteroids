@@ -2,6 +2,8 @@ let gulp = require('gulp')
 let gutil = require('gulp-util')
 let eslint = require('gulp-eslint')
 let mocha = require('gulp-mocha')
+let istanbul = require('gulp-istanbul')
+let nodemon = require('gulp-nodemon')
 let browserify = require('browserify')
 let babelify = require('babelify')
 let source = require('vinyl-source-stream')
@@ -9,6 +11,8 @@ let source = require('vinyl-source-stream')
 let sourceFile = './client/src/js/game.js'
 let destFolder = './public/js/'
 let destFile = 'game.js'
+
+let node
 
 gulp.task('lint', () => {
   return gulp.src([
@@ -21,10 +25,17 @@ gulp.task('lint', () => {
     .pipe(eslint.failAfterError())
 })
 
-gulp.task('test', () => {
-  gulp.src('./tests/**/*.js')
+gulp.task('test-server', () => {
+  return gulp.src('./tests/server/**/*.js')
     .pipe(mocha())
 })
+
+gulp.task('test-client', () => {
+  return gulp.src('./tests/client/**/*.js')
+    .pipe(mocha())
+})
+
+gulp.task('test', ['test-server', 'test-client'])
 
 gulp.task('bundle-debug', () => {
   browserify({
@@ -55,11 +66,24 @@ gulp.task('bundle-release', () => {
     .pipe(gulp.dest(destFolder))
 })
 
-gulp.task('build-debug', ['lint', 'test', 'bundle-debug'])
+gulp.task('build-debug', ['lint', 'test-client', 'bundle-debug'])
 gulp.task('build', ['lint', 'test', 'bundle-release'])
 
-gulp.task('watch', () => {
-  gulp.watch(['./client/src/js/**/*.js', '/server/**/*.js', './main.js'], ['build-debug'])
+gulp.task('start', (cb) => {
+  let nd = nodemon({
+    script: 'main.js',
+    watch: ['main.js', './server/**/*.js', './client/shared/**/*.js'],
+    nodeArgs: ['--debug']
+  })
+    .on('restart', ['lint', 'test-server'])
+    .on('crash', () => {
+      console.error('Server has crashed!\n')
+      nd.emit('restart', 10)
+    })
 })
 
-gulp.task('default', ['watch'])
+gulp.task('watch', () => {
+  gulp.watch(['./client/src/js/**/*.js'], ['build-debug'])
+})
+
+gulp.task('default', ['start', 'watch'])

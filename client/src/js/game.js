@@ -10,6 +10,7 @@ assets.load([
   'sprites/sheet.json'
 ]).then(() => setup())
 
+// define 'main' variables
 let canvas, ship, message, shootSfx, bg
 let bullets = []
 let asteroids = []
@@ -51,6 +52,7 @@ function spawnAsteroid () {
   asteroids.push(asteroid)
 }
 
+// Let's party begins!
 function setup () {
   canvas = makeCanvas(1280, 720, 'none')
   stage.width = canvas.width
@@ -164,7 +166,7 @@ function gameLoop () {
       // destroy ship
       ship.destroyed = true
       // stage.removeChild(ship);
-      particleEffect(ship.x, ship.y)
+      particleEffect(ship.centerX, ship.centerY)
 
       // respawn ship
       setTimeout(() => {
