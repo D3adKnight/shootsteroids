@@ -2,7 +2,6 @@ let gulp = require('gulp'),
     gutil = require('gulp-util'),
     browserify = require('browserify'),
     babelify = require('babelify'),
-    watchify = require('watchify'),
     source = require('vinyl-source-stream'),
 
     sourceFile = './client/js/src/game.js',
