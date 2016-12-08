@@ -1,7 +1,11 @@
+// Import engine code
 import {makeCanvas, remove, render, stage, sprite, text, background, particles, particleEffect} from './engine/display'
-import {assets, wrap, outsideBounds, randomInt, randomFloat} from './engine/utilities'
+import {assets, wrap, outsideBounds} from './engine/utilities'
 import {keyboard} from './engine/interactive'
-import {movingCircleCollision, circleRectangleCollision} from './engine/collision'
+import {circleRectangleCollision} from './engine/collision'
+
+// Import game code
+import {Asteroid, spawnAsteroid} from './game/asteroid'
 
 assets.load([
   'bgs/darkPurple.png',
@@ -13,7 +17,6 @@ assets.load([
 // define 'main' variables
 let canvas, ship, message, shootSfx, bg
 let bullets = []
-let asteroids = []
 
 let score = 0
 
@@ -32,84 +35,8 @@ function shoot (
 
   bulletsArray.push(bullet)
 
-  particleEffect(bullet.x, bullet.y)
+  // particleEffect(bullet.x, bullet.y)
   shootSfx.play()
-}
-
-function spawnAsteroid (size = 'big') {
-  const _asteroidsBig = [
-    'meteorBrown_big1.png',
-    'meteorGrey_big1.png',
-    'meteorBrown_big2.png',
-    'meteorGrey_big2.png',
-    'meteorBrown_big3.png',
-    'meteorGrey_big3.png',
-    'meteorBrown_big4.png',
-    'meteorGrey_big4.png'
-  ]
-
-  const _asteroidsMed = [
-    'meteorBrown_med1.png',
-    'meteorGrey_med1.png',
-    'meteorBrown_med2.png',
-    'meteorGrey_med2.png'
-  ]
-
-  const _asteroidsSmall = [
-    'meteorBrown_small1.png',
-    'meteorGrey_small1.png',
-    'meteorBrown_small2.png',
-    'meteorGrey_small2.png'
-  ]
-
-  const _asteroidsTiny = [
-    'meteorBrown_tiny1.png',
-    'meteorGrey_tiny1.png',
-    'meteorBrown_tiny2.png',
-    'meteorGrey_tiny2.png'
-  ]
-
-  let selectAsteroid = (size) => {
-    let source, index
-    if (size === 'big') {
-      source = _asteroidsBig
-    } else if (size === 'med') {
-      source = _asteroidsMed
-    } else if (size === 'small') {
-      source = _asteroidsSmall
-    } else if (size === 'tiny') {
-      source = _asteroidsTiny
-    }
-
-    index = randomInt(0, source.length - 1)
-    return source[index]
-  }
-
-  let type = selectAsteroid(size)
-  let x = randomInt(0, stage.localBounds.width)
-  let y = randomInt(0, stage.localBounds.height)
-
-  let asteroid = sprite(assets[type], x, y)
-  asteroid.circular = true
-  asteroid.diameter = assets[type].w
-  asteroid.hp = 0
-
-  if (size === 'big') {
-    asteroid.hp = 10
-  } else if (size === 'med') {
-    asteroid.hp = 7
-  } else if (size === 'small') {
-    asteroid.hp = 5
-  } else if (size === 'tiny') {
-    asteroid.hp = 3
-  }
-
-  asteroid.vx = randomFloat(-5, 5)
-  asteroid.vy = randomFloat(-5, 5)
-
-  asteroid.rotationSpeed = randomFloat(0.01, 0.07)
-
-  asteroids.push(asteroid)
 }
 
 // Let's party begins!
@@ -199,9 +126,11 @@ function gameLoop () {
       return false
     }
 
+    let asteroids = Asteroid.asteroids
     for (let i = 0; i < asteroids.length; i++) {
-      let hit = circleRectangleCollision(bullet, asteroids[i])
+      let hit = circleRectangleCollision(bullet, asteroids[i].sprite)
       if (hit) {
+        score += asteroids[i].hit(2)
         remove(bullet)
         return false
       }
@@ -210,6 +139,8 @@ function gameLoop () {
     return true
   })
 
+  Asteroid.updateAll(0)
+/*
   for (let i = 0; i < asteroids.length; i++) {
     let a1 = asteroids[i]
 
@@ -245,7 +176,7 @@ function gameLoop () {
       }, 1000)
     }
   }
-
+*/
   if (!ship.destroyed) {
     ship.rotation += ship.rotationSpeed
 
