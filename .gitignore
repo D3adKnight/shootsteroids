@@ -86,3 +86,7 @@ $RECYCLE.BIN/
 
 #VSCode
 .browse.VC.db
+
+# builded client files
+public/js/
+public/css/

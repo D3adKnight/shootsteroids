@@ -11,9 +11,17 @@ let sourceFile = './client/src/js/game.js'
 let destFolder = './public/js/'
 let destFile = 'game.js'
 
-gulp.task('lint', () => {
+gulp.task('lint-client', () => {
   return gulp.src([
-    './client/src/js/**/*.js',
+    './client/src/js/**/*.js'
+  ])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError())
+})
+
+gulp.task('lint-server', () => {
+  return gulp.src([
     './server/**/*.js',
     './main.js'
   ])
@@ -21,6 +29,8 @@ gulp.task('lint', () => {
     .pipe(eslint.format())
     .pipe(eslint.failAfterError())
 })
+
+gulp.task('lint', ['lint-client', 'lint-server'])
 
 gulp.task('test-server', () => {
   return gulp.src('./tests/server/**/*.js')
@@ -63,7 +73,7 @@ gulp.task('bundle-release', () => {
     .pipe(gulp.dest(destFolder))
 })
 
-gulp.task('build-debug', ['lint', 'test-client', 'bundle-debug'])
+gulp.task('build-debug', ['lint-client', 'test-client', 'bundle-debug'])
 gulp.task('build', ['lint', 'test', 'bundle-release'])
 
 gulp.task('start', (cb) => {
