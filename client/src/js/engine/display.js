@@ -701,8 +701,8 @@ class Sprite extends DisplayObject {
     this.source = this.tilesetFrame.source
     this.sourceX = this.tilesetFrame.sx
     this.sourceY = this.tilesetFrame.sy
-    this.sourceWidth = source.tilew
-    this.sourceHeight = source.tileh
+    this.sourceWidth = source.w
+    this.sourceHeight = source.h
 
     this.width = this.tilesetFrame.w
     this.height = this.tilesetFrame.h

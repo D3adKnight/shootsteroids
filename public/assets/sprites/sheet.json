@@ -1389,174 +1389,174 @@
 		},
 		"meteorBrown_big2.png": {
 			"name": "meteorBrown_big2.png",
-			"sx": "0",
-			"sy": "520",
-			"w": "120",
-			"h": "98",
-			"tilew": "120",
-			"tileh": "98"
+			"sx": 0,
+			"sy": 520,
+			"w": 120,
+			"h": 98,
+			"tilew": 120,
+			"tileh": 98
 		},
 		"meteorBrown_big3.png": {
 			"name": "meteorBrown_big3.png",
-			"sx": "518",
-			"sy": "810",
-			"w": "89",
-			"h": "82",
-			"tilew": "89",
-			"tileh": "82"
+			"sx": 518,
+			"sy": 810,
+			"w": 89,
+			"h": 82,
+			"tilew": 89,
+			"tileh": 82
 		},
 		"meteorBrown_big4.png": {
 			"name": "meteorBrown_big4.png",
-			"sx": "327",
-			"sy": "452",
-			"w": "98",
-			"h": "96",
-			"tilew": "98",
-			"tileh": "96"
+			"sx": 327,
+			"sy": 452,
+			"w": 98,
+			"h": 96,
+			"tilew": 98,
+			"tileh": 96
 		},
 		"meteorBrown_med1.png": {
 			"name": "meteorBrown_med1.png",
-			"sx": "651",
-			"sy": "447",
-			"w": "43",
-			"h": "43",
-			"tilew": "43",
-			"tileh": "43"
+			"sx": 651,
+			"sy": 447,
+			"w": 43,
+			"h": 43,
+			"tilew": 43,
+			"tileh": 43
 		},
 		"meteorBrown_med3.png": {
 			"name": "meteorBrown_med3.png",
-			"sx": "237",
-			"sy": "452",
-			"w": "45",
-			"h": "40",
-			"tilew": "45",
-			"tileh": "40"
+			"sx": 237,
+			"sy": 452,
+			"w": 45,
+			"h": 40,
+			"tilew": 45,
+			"tileh": 40
 		},
 		"meteorBrown_small1.png": {
 			"name": "meteorBrown_small1.png",
-			"sx": "406",
-			"sy": "234",
-			"w": "28",
-			"h": "28",
-			"tilew": "28",
-			"tileh": "28"
+			"sx": 406,
+			"sy": 234,
+			"w": 28,
+			"h": 28,
+			"tilew": 28,
+			"tileh": 28
 		},
 		"meteorBrown_small2.png": {
 			"name": "meteorBrown_small2.png",
-			"sx": "778",
-			"sy": "587",
-			"w": "29",
-			"h": "26",
-			"tilew": "29",
-			"tileh": "26"
+			"sx": 778,
+			"sy": 587,
+			"w": 29,
+			"h": 26,
+			"tilew": 29,
+			"tileh": 26
 		},
 		"meteorBrown_tiny1.png": {
 			"name": "meteorBrown_tiny1.png",
-			"sx": "346",
-			"sy": "814",
-			"w": "18",
-			"h": "18",
-			"tilew": "18",
-			"tileh": "18"
+			"sx": 346,
+			"sy": 814,
+			"w": 18,
+			"h": 18,
+			"tilew": 18,
+			"tileh": 18
 		},
 		"meteorBrown_tiny2.png": {
 			"name": "meteorBrown_tiny2.png",
-			"sx": "399",
-			"sy": "814",
-			"w": "16",
-			"h": "15",
-			"tilew": "16",
-			"tileh": "15"
+			"sx": 399,
+			"sy": 814,
+			"w": 16,
+			"h": 15,
+			"tilew": 16,
+			"tileh": 15
 		},
 		"meteorGrey_big1.png": {
 			"name": "meteorGrey_big1.png",
-			"sx": "224",
-			"sy": "748",
-			"w": "101",
-			"h": "84",
-			"tilew": "101",
-			"tileh": "84"
+			"sx": 224,
+			"sy": 748,
+			"w": 101,
+			"h": 84,
+			"tilew": 101,
+			"tileh": 84
 		},
 		"meteorGrey_big2.png": {
 			"name": "meteorGrey_big2.png",
-			"sx": "0",
-			"sy": "618",
-			"w": "120",
-			"h": "98",
-			"tilew": "120",
-			"tileh": "98"
+			"sx": 0,
+			"sy": 618,
+			"w": 120,
+			"h": 98,
+			"tilew": 120,
+			"tileh": 98
 		},
 		"meteorGrey_big3.png": {
 			"name": "meteorGrey_big3.png",
-			"sx": "516",
-			"sy": "728",
-			"w": "89",
-			"h": "82",
-			"tilew": "89",
-			"tileh": "82"
+			"sx": 516,
+			"sy": 728,
+			"w": 89,
+			"h": 82,
+			"tilew": 89,
+			"tileh": 82
 		},
 		"meteorGrey_big4.png": {
 			"name": "meteorGrey_big4.png",
-			"sx": "327",
-			"sy": "548",
-			"w": "98",
-			"h": "96",
-			"tilew": "98",
-			"tileh": "96"
+			"sx": 327,
+			"sy": 548,
+			"w": 98,
+			"h": 96,
+			"tilew": 98,
+			"tileh": 96
 		},
 		"meteorGrey_med1.png": {
 			"name": "meteorGrey_med1.png",
-			"sx": "674",
-			"sy": "219",
-			"w": "43",
-			"h": "43",
-			"tilew": "43",
-			"tileh": "43"
+			"sx": 674,
+			"sy": 219,
+			"w": 43,
+			"h": 43,
+			"tilew": 43,
+			"tileh": 43
 		},
 		"meteorGrey_med2.png": {
 			"name": "meteorGrey_med2.png",
-			"sx": "282",
-			"sy": "452",
-			"w": "45",
-			"h": "40",
-			"tilew": "45",
-			"tileh": "40"
+			"sx": 282,
+			"sy": 452,
+			"w": 45,
+			"h": 40,
+			"tilew": 45,
+			"tileh": 40
 		},
 		"meteorGrey_small1.png": {
 			"name": "meteorGrey_small1.png",
-			"sx": "406",
-			"sy": "262",
-			"w": "28",
-			"h": "28",
-			"tilew": "28",
-			"tileh": "28"
+			"sx": 406,
+			"sy": 262,
+			"w": 28,
+			"h": 28,
+			"tilew": 28,
+			"tileh": 28
 		},
 		"meteorGrey_small2.png": {
 			"name": "meteorGrey_small2.png",
-			"sx": "396",
-			"sy": "413",
-			"w": "29",
-			"h": "26",
-			"tilew": "29",
-			"tileh": "26"
+			"sx": 396,
+			"sy": 413,
+			"w": 29,
+			"h": 26,
+			"tilew": 29,
+			"tileh": 26
 		},
 		"meteorGrey_tiny1.png": {
 			"name": "meteorGrey_tiny1.png",
-			"sx": "364",
-			"sy": "814",
-			"w": "18",
-			"h": "18",
-			"tilew": "18",
-			"tileh": "18"
+			"sx": 364,
+			"sy": 814,
+			"w": 18,
+			"h": 18,
+			"tilew": 18,
+			"tileh": 18
 		},
 		"meteorGrey_tiny2.png": {
 			"name": "meteorGrey_tiny2.png",
-			"sx": "602",
-			"sy": "646",
-			"w": "16",
-			"h": "15",
-			"tilew": "16",
-			"tileh": "15"
+			"sx": 602,
+			"sy": 646,
+			"w": 16,
+			"h": 15,
+			"tilew": 16,
+			"tileh": 15
 		},
 		"numeral0.png": {
 			"name": "numeral0.png",

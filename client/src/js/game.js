@@ -36,13 +36,73 @@ function shoot (
   shootSfx.play()
 }
 
-function spawnAsteroid () {
+function spawnAsteroid (size = 'big') {
+  const _asteroidsBig = [
+    'meteorBrown_big1.png',
+    'meteorGrey_big1.png',
+    'meteorBrown_big2.png',
+    'meteorGrey_big2.png',
+    'meteorBrown_big3.png',
+    'meteorGrey_big3.png',
+    'meteorBrown_big4.png',
+    'meteorGrey_big4.png'
+  ]
+
+  const _asteroidsMed = [
+    'meteorBrown_med1.png',
+    'meteorGrey_med1.png',
+    'meteorBrown_med2.png',
+    'meteorGrey_med2.png'
+  ]
+
+  const _asteroidsSmall = [
+    'meteorBrown_small1.png',
+    'meteorGrey_small1.png',
+    'meteorBrown_small2.png',
+    'meteorGrey_small2.png'
+  ]
+
+  const _asteroidsTiny = [
+    'meteorBrown_tiny1.png',
+    'meteorGrey_tiny1.png',
+    'meteorBrown_tiny2.png',
+    'meteorGrey_tiny2.png'
+  ]
+
+  let selectAsteroid = (size) => {
+    let source, index
+    if (size === 'big') {
+      source = _asteroidsBig
+    } else if (size === 'med') {
+      source = _asteroidsMed
+    } else if (size === 'small') {
+      source = _asteroidsSmall
+    } else if (size === 'tiny') {
+      source = _asteroidsTiny
+    }
+
+    index = randomInt(0, source.length - 1)
+    return source[index]
+  }
+
+  let type = selectAsteroid(size)
   let x = randomInt(0, stage.localBounds.width)
   let y = randomInt(0, stage.localBounds.height)
 
-  let asteroid = sprite(assets['meteorBrown_big1.png'], x, y)
+  let asteroid = sprite(assets[type], x, y)
   asteroid.circular = true
-  asteroid.diameter = 90
+  asteroid.diameter = assets[type].w
+  asteroid.hp = 0
+
+  if (size === 'big') {
+    asteroid.hp = 10
+  } else if (size === 'med') {
+    asteroid.hp = 7
+  } else if (size === 'small') {
+    asteroid.hp = 5
+  } else if (size === 'tiny') {
+    asteroid.hp = 3
+  }
 
   asteroid.vx = randomFloat(-5, 5)
   asteroid.vy = randomFloat(-5, 5)
@@ -63,8 +123,8 @@ function setup () {
   bg = background(assets['bgs/darkPurple.png'], canvas.width, canvas.height)
 
   ship = sprite(assets['playerShip2_red.png'])
-  ship.scaleX = 0.5
-  ship.scaleY = 0.5
+  ship.width = ship.halfWidth
+  ship.height = ship.halfHeight
   stage.putCenter(ship)
 
   ship.vx = 0
@@ -137,6 +197,14 @@ function gameLoop () {
     if (collision) {
       remove(bullet)
       return false
+    }
+
+    for (let i = 0; i < asteroids.length; i++) {
+      let hit = circleRectangleCollision(bullet, asteroids[i])
+      if (hit) {
+        remove(bullet)
+        return false
+      }
     }
 
     return true
