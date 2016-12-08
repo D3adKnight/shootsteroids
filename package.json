@@ -8,12 +8,18 @@
     "type": "git",
     "url": "https://github.com/D3adKnight/shootsteroids.git"
   },
+  "babel": {
+    "presets": [
+      "latest"
+    ]
+  },
   "scripts": {
     "start": "node main.js",
-    "start-dev": "node --debug main.js",
+    "start:dev": "node --debug main.js",
     "build-dev": "gulp build-debug",
     "build": "gulp build",
-    "test": "gulp test"
+    "test": "gulp test",
+    "browserify": "browserify -t babelify client/src/js/game.js -o public/app.js"
   },
   "dependencies": {
     "ejs": "^2.5.2",
@@ -26,7 +32,6 @@
     "browserify": "latest",
     "gulp": "latest",
     "gulp-eslint": "^3.0.1",
-    "gulp-istanbul": "^1.1.1",
     "gulp-mocha": "^3.0.1",
     "gulp-nodemon": "^2.2.1",
     "gulp-util": "^3.0.7",

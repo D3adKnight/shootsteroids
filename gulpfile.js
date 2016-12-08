@@ -2,7 +2,6 @@ let gulp = require('gulp')
 let gutil = require('gulp-util')
 let eslint = require('gulp-eslint')
 let mocha = require('gulp-mocha')
-let istanbul = require('gulp-istanbul')
 let nodemon = require('gulp-nodemon')
 let browserify = require('browserify')
 let babelify = require('babelify')
@@ -24,44 +23,13 @@ gulp.task('lint', () => {
 })
 
 gulp.task('test-server', () => {
-  // return gulp.src('./tests/server/**/*.js')
-  //    .pipe(mocha())
-  return gulp.src([
-    'main.js',
-    './server/**/*.js',
-    './client/shared/**/*.js'
-  ])
-      .pipe(istanbul({includeUntested: true}))
-      .on('finish', () => {
-        gulp.src([
-          './tests/server/**/*.js',
-          './tests/client/**/*.js'
-        ])
-        .pipe(mocha({reporter: 'spec'}))
-        .pipe(istanbul.writeReports({
-          dir: './tests/coverage/server',
-          reporters: ['lcov'],
-          reportOpts: {dir: './tests/coverage/server'}
-        }))
-      })
+  return gulp.src('./tests/server/**/*.js')
+    .pipe(mocha())
 })
 
 gulp.task('test-client', () => {
-  // return gulp.src('./tests/client/**/*.js')
-  //  .pipe(mocha())
-  return gulp.src('./client/**/*.js')
-      .pipe(istanbul({includeUntested: true}))
-      .on('finish', () => {
-        gulp.src([
-          './tests/client/**/*.js'
-        ])
-        .pipe(mocha({reporter: 'spec'}))
-        .pipe(istanbul.writeReports({
-          dir: './tests/coverage/client',
-          reporters: ['lcov'],
-          reportOpts: {dir: './tests/coverage/client'}
-        }))
-      })
+  return gulp.src('./tests/client/**/*.js')
+    .pipe(mocha())
 })
 
 gulp.task('test', ['test-server', 'test-client'])
