@@ -85,7 +85,7 @@ class DisplayObject {
     }
   }
 
-    // Children manipulation
+  // Children manipulation
   addChild (sprite) {
     if (sprite.parent) {
       sprite.parent.removeChild(sprite)
@@ -97,6 +97,7 @@ class DisplayObject {
   removeChild (sprite) {
     if (sprite.parent === this) {
       this.children.splice(this.children.indexOf(sprite), 1)
+      sprite.parent = null
     } else {
       throw new Error(sprite + ' is not a child of ' + this)
     }
@@ -618,6 +619,7 @@ class Group extends DisplayObject {
   removeChild (sprite) {
     if (sprite.parent === this) {
       this.children.splice(this.children.indexOf(sprite), 1)
+      sprite.parent = null
       this.calculateSize()
     } else {
       throw new Error(`${sprite} is not child of ${this}`)

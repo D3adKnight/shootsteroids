@@ -1758,12 +1758,12 @@
 		},
 		"playerLife2_red.png": {
 			"name": "playerLife2_red.png",
-			"sx": "502",
-			"sy": "991",
-			"w": "37",
-			"h": "26",
-			"tilew": "37",
-			"tileh": "26"
+			"sx": 502,
+			"sy": 991,
+			"w": 37,
+			"h": 26,
+			"tilew": 37,
+			"tileh": 26
 		},
 		"playerLife3_blue.png": {
 			"name": "playerLife3_blue.png",

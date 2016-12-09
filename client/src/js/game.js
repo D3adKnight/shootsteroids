@@ -1,11 +1,13 @@
 // Import engine code
-import {makeCanvas, remove, render, stage, sprite, text, background, particles, particleEffect} from './engine/display'
-import {assets, wrap, outsideBounds} from './engine/utilities'
+import {makeCanvas, remove, render, stage, sprite, text, background, particles} from './engine/display'
+import {assets, outsideBounds} from './engine/utilities'
 import {keyboard} from './engine/interactive'
 import {circleRectangleCollision} from './engine/collision'
 
 // Import game code
 import {Asteroid, spawnAsteroid} from './game/asteroid'
+import {Ship} from './game/ship'
+import {HUD} from './game/hud'
 
 assets.load([
   'bgs/darkPurple.png',
@@ -15,8 +17,9 @@ assets.load([
 ]).then(() => setup())
 
 // define 'main' variables
-let canvas, ship, message, shootSfx, bg
+let canvas, ship, hud, shootSfx, bg
 let bullets = []
+let isGameOver
 
 let score = 0
 
@@ -49,24 +52,7 @@ function setup () {
 
   bg = background(assets['bgs/darkPurple.png'], canvas.width, canvas.height)
 
-  ship = sprite(assets['playerShip2_red.png'])
-  ship.width = ship.halfWidth
-  ship.height = ship.halfHeight
-  stage.putCenter(ship)
-
-  ship.vx = 0
-  ship.vy = 0
-  ship.accelerationX = 0.2
-  ship.accelerationY = 0.2
-  ship.friction = 0.96
-  ship.speed = 0
-
-  ship.rotationSpeed = 0
-
-  ship.moveForward = false
-
-  ship.lives = 3
-  ship.destroyed = false
+  ship = new Ship(assets['playerShip2_red.png'])
 
   let leftArrow = keyboard(37)
   let rightArrow = keyboard(39)
@@ -97,17 +83,17 @@ function setup () {
         )
   }
 
-  message = text('Hello!', '16px kenvector_future_thin', 'white', 8, 8)
-
   for (let i = 0; i < 5; i++) {
     spawnAsteroid()
   }
+
+  hud = new HUD()
 
   gameLoop()
 }
 
 function gameLoop () {
-  requestAnimationFrame(gameLoop)
+  if (isGameOver) return
 
   if (particles.length > 0) {
     particles.forEach(particle => {
@@ -139,65 +125,26 @@ function gameLoop () {
     return true
   })
 
-  Asteroid.updateAll(0)
-/*
-  for (let i = 0; i < asteroids.length; i++) {
-    let a1 = asteroids[i]
+  Asteroid.updateAll()
 
-    // update asteroid
-    a1.rotation += a1.rotationSpeed
-    a1.x += a1.vx
-    a1.y += a1.vy
-
-    wrap(a1, stage.localBounds)
-
-    // check collisisons
-    // between asteroids
-    for (let j = i + 1; j < asteroids.length; j++) {
-      let a2 = asteroids[j]
-
-      movingCircleCollision(a1, a2)
-    }
-        // and with player
-    let playerHit = circleRectangleCollision(a1, ship, true)
-    if (playerHit) {
-      ship.lives -= 1
-      // destroy ship
-      ship.destroyed = true
-      // stage.removeChild(ship);
-      particleEffect(ship.centerX, ship.centerY)
-
-      // respawn ship
-      setTimeout(() => {
-        // stage.addChild(ship);
-        stage.putCenter(ship)
-        ship.rotation = 0
-        ship.destroyed = false
-      }, 1000)
-    }
+  if (!ship.invulnerable) {
+    Asteroid.asteroids.forEach(a => {
+      let playerHit = circleRectangleCollision(a.sprite, ship.sprite, true)
+      if (playerHit) {
+        isGameOver = ship.hit()
+      }
+    })
   }
-*/
-  if (!ship.destroyed) {
-    ship.rotation += ship.rotationSpeed
 
-    if (ship.moveForward) {
-      ship.vx += ship.accelerationX * Math.sin(ship.rotation)
-      ship.vy += -ship.accelerationY * Math.cos(ship.rotation)
-    } else {
-      ship.vx *= ship.friction
-      ship.vy *= ship.friction
-    }
-
-    ship.x += ship.vx
-    ship.y += ship.vy
-
-    wrap(ship, stage.localBounds)
-  }
+  ship.update()
 
   bg.x -= Math.floor(ship.vx)
   bg.y -= Math.floor(ship.vy)
 
-  message.content = 'Scores: ' + score
+  // message.content = 'Scores: ' + score
+  hud.update(score, ship.lives, isGameOver)
 
   render(canvas)
+
+  requestAnimationFrame(gameLoop)
 }
