@@ -1,5 +1,3 @@
-// import {sprite} from '../engine/display'
-
 export class Entity {
   constructor () {
     this.id = Math.random().toString().replace(/\D/g, '')

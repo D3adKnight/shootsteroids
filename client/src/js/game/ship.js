@@ -20,6 +20,12 @@ export class Ship extends Entity {
 
     this.moveForward = false
 
+    this._position = {
+      x: this.sprite.x,
+      y: this.sprite.y,
+      rotation: this.sprite.rotation
+    }
+
     this.lives = 3
     this.destroyed = false
     this.invulnerable = false
@@ -37,13 +43,18 @@ export class Ship extends Entity {
     return this.sprite.centerY
   }
 
+  set position (data) {
+    console.log(data)
+    this._position = data
+  }
+
   update (dt) {
     if (this.destroyed) {
       return
     }
 
-    this.sprite.rotation += this.rotationSpeed
-
+    this.sprite.rotation = this._position.rotation // += this.rotationSpeed
+/*
     if (this.moveForward) {
       this.vx += this.acceleration * Math.sin(this.sprite.rotation)
       this.vy += -this.acceleration * Math.cos(this.sprite.rotation)
@@ -51,9 +62,9 @@ export class Ship extends Entity {
       this.vx *= this.friction
       this.vy *= this.friction
     }
-
-    this.sprite.x += this.vx
-    this.sprite.y += this.vy
+*/
+    this.sprite.x = this._position.x // += this.vx
+    this.sprite.y = this._position.y // += this.vy
 
     wrap(this.sprite, stage.localBounds)
   }
@@ -78,6 +89,9 @@ export class Ship extends Entity {
     stage.addChild(this.sprite)
     stage.putCenter(this.sprite)
     this.sprite.rotation = 0
+    this.acceleration = 0
+    this.vx = 0
+    this.vy = 0
 
     this.destroyed = false
 

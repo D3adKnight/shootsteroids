@@ -15,7 +15,7 @@ class Lives {
     if (this.liveSprites.length < lives) {
       let i = this.liveSprites.length
       let posX = 0
-      for (; i <= lives; i++) {
+      for (; i < lives; i++) {
         let live = sprite(this.template)
         live.x = posX
         this.liveSprites.push(live)
@@ -23,8 +23,10 @@ class Lives {
 
         posX += this.offset
       }
-    } else {
-      // bla-bla
+    } else if (this.liveSprites.length > lives) {
+      let toRemove = this.liveSprites.length - lives
+      let removed = this.liveSprites.splice(0, toRemove)
+      removed.forEach(live => this.lives.removeChild(live))
     }
   }
 }
@@ -33,7 +35,7 @@ export class HUD {
   constructor () {
     this.scores = text('Hello!', '16px kenvector_future_thin', 'white', 8, 8)
     this.lives = new Lives(assets['playerLife2_red.png'], stage.width - 142, 8)
-    this.gameOver = text('Game Over', '48px kenvector_future_thin', 'white', 495, 340)
+    this.gameOver = text('Game Over', '48px kenvector_future_thin', 'white', 640, 340)
     this.gameOver.visible = false
   }
 

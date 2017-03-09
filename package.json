@@ -18,8 +18,7 @@
     "start:dev": "node --debug main.js",
     "build-dev": "gulp build-debug",
     "build": "gulp build",
-    "test": "gulp test",
-    "browserify": "browserify -t babelify client/src/js/game.js -o public/app.js"
+    "test": "gulp test"
   },
   "dependencies": {
     "ejs": "^2.5.2",

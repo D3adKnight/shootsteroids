@@ -1,5 +1,5 @@
 // Import engine code
-import {makeCanvas, remove, render, stage, sprite, text, background, particles} from './engine/display'
+import {makeCanvas, remove, render, stage, sprite, background, particles} from './engine/display'
 import {assets, outsideBounds} from './engine/utilities'
 import {keyboard} from './engine/interactive'
 import {circleRectangleCollision} from './engine/collision'
@@ -20,6 +20,15 @@ assets.load([
 let canvas, ship, hud, shootSfx, bg
 let bullets = []
 let isGameOver
+let socket = io()
+
+socket.on('playerCount', data => {
+  document.getElementById('players').innerHTML = 'Players: ' + data
+})
+
+socket.on('positions', data => {
+  if (ship) ship.position = data[0]
+})
 
 let score = 0
 
@@ -59,20 +68,35 @@ function setup () {
   let upArrow = keyboard(38)
   let space = keyboard(32)
 
-  leftArrow.press = () => { ship.rotationSpeed = -0.1 }
+  leftArrow.press = () => {
+    // ship.rotationSpeed = -0.1
+    socket.emit('keyState', { key: 'left', state: true })
+  }
   leftArrow.release = () => {
-    if (!rightArrow.isDown) ship.rotationSpeed = 0
+    // if (!rightArrow.isDown) ship.rotationSpeed = 0
+    socket.emit('keyState', { key: 'left', state: false })
   }
 
-  rightArrow.press = () => { ship.rotationSpeed = 0.1 }
+  rightArrow.press = () => {
+    // ship.rotationSpeed = 0.1
+    socket.emit('keyState', { key: 'right', state: true })
+  }
   rightArrow.release = () => {
-    if (!leftArrow.isDown) ship.rotationSpeed = 0
+    // if (!leftArrow.isDown) ship.rotationSpeed = 0
+    socket.emit('keyState', { key: 'right', state: false })
   }
 
-  upArrow.press = () => { ship.moveForward = true }
-  upArrow.release = () => { ship.moveForward = false }
+  upArrow.press = () => {
+    // ship.moveForward = true
+    socket.emit('keyState', { key: 'up', state: true })
+  }
+  upArrow.release = () => {
+    // ship.moveForward = false
+    socket.emit('keyState', { key: 'up', state: false })
+  }
 
   space.press = () => {
+    /*
     shoot(
             ship, ship.rotation, 14, 10, bullets,
             () => sprite(assets['laserRed07.png'])
@@ -81,6 +105,11 @@ function setup () {
             ship, ship.rotation, -14, 10, bullets,
             () => sprite(assets['laserRed07.png'])
         )
+    */
+    socket.emit('keyState', { key: 'space', state: true })
+  }
+  space.release = () => {
+    socket.emit('keyState', { key: 'space', state: false })
   }
 
   for (let i = 0; i < 5; i++) {
