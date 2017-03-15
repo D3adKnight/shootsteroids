@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Запустить программу",
-            "program": "${workspaceRoot}/main.js",
+            "program": "${workspaceRoot}/lib/server/index.js",
             "cwd": "${workspaceRoot}"
         },
         {

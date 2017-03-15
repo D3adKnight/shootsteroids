@@ -1,4 +1,4 @@
-let Entity = require('./entity')
+import Entity from './entity'
 
 let ships = {}
 
@@ -79,4 +79,4 @@ class Ship extends Entity {
   }
 }
 
-module.exports = Ship
+export default Ship

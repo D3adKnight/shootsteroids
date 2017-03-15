@@ -1,5 +1,5 @@
 // Entity components
-
+/*
 class Component {
   constructor (parent) {
     this.parent = parent
@@ -38,3 +38,4 @@ class PhysicsComponent extends Component {
     //
   }
 }
+*/

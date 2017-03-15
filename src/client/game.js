@@ -1,29 +1,37 @@
 // Import engine code
-import {makeCanvas, remove, render, stage, sprite, background, particles} from './engine/display'
+import {makeCanvas, remove, render, stage, background, particles} from './engine/display'
 import {assets, outsideBounds} from './engine/utilities'
 import {keyboard} from './engine/interactive'
 import {circleRectangleCollision} from './engine/collision'
+
+import io from 'socket.io-client'
 
 // Import game code
 import {Asteroid, spawnAsteroid} from './game/asteroid'
 import {Ship} from './game/ship'
 import {HUD} from './game/hud'
 
-assets.load([
-  'bgs/darkPurple.png',
-  'fonts/kenvector_future_thin.ttf',
-  'sounds/sfx_laser1.mp3',
-  'sprites/sheet.json'
-]).then(() => setup())
+export default function start () {
+  assets.load([
+    'bgs/darkPurple.png',
+    'fonts/kenvector_future_thin.ttf',
+    'sounds/sfx_laser1.mp3',
+    'sprites/sheet.json'
+  ]).then(() => setup())
+}
 
 // define 'main' variables
-let canvas, ship, hud, shootSfx, bg
+let canvas, ship, hud, /* shootSfx, */ bg
 let bullets = []
 let isGameOver
-let socket = io()
+let socket = io(window.location.host)
+
+socket.on('connect', () => {
+  //
+})
 
 socket.on('playerCount', data => {
-  document.getElementById('players').innerHTML = 'Players: ' + data
+  // document.getElementById('players').innerHTML = 'Players: ' + data
 })
 
 socket.on('positions', data => {
@@ -31,7 +39,7 @@ socket.on('positions', data => {
 })
 
 let score = 0
-
+/*
 function shoot (
             shooter, angle, offsetFromCenter,
             bulletSpeed, bulletsArray, bulletSprite) {
@@ -50,14 +58,14 @@ function shoot (
   // particleEffect(bullet.x, bullet.y)
   shootSfx.play()
 }
-
+*/
 // Let's party begins!
 function setup () {
   canvas = makeCanvas(1280, 720, 'none')
   stage.width = canvas.width
   stage.height = canvas.height
 
-  shootSfx = assets['sounds/sfx_laser1.mp3']
+  // shootSfx = assets['sounds/sfx_laser1.mp3']
 
   bg = background(assets['bgs/darkPurple.png'], canvas.width, canvas.height)
 

@@ -164,7 +164,12 @@ Bullet.update = function () {
   return pack
 }
 */
-let Ship = require('./ship')
+import {
+  IO_CONNECT,
+  IO_DISCONNECT
+} from '../shared/protocol'
+
+import Ship from './ship'
 
 // multiplayer support
 let SOKET_LIST = {}
@@ -172,7 +177,8 @@ let SOKET_LIST = {}
 let playerCount = 0
 
 let socketsSetup = (io) => {
-  io.on('connection', socket => {
+  io.on(IO_CONNECT, socket => {
+    console.log('client connected!')
     socket.id = Math.random().toString().replace(/\D/g, '')
     SOKET_LIST[socket.id] = socket
     Ship.spawnShip(socket)
@@ -180,7 +186,8 @@ let socketsSetup = (io) => {
     playerCount++
     io.emit('playerCount', playerCount)
 
-    socket.on('disconnect', () => {
+    socket.on(IO_DISCONNECT, () => {
+      console.log('client disconnected!')
       playerCount--
       io.emit('playerCount', playerCount)
 
@@ -208,7 +215,7 @@ let socketsSetup = (io) => {
         socket.emit('positions', pack)
       })
     }
-  }, 1000 / 25) // 25fps server tick
+  }, 1000 / 30) // 25fps server tick
 }
 
-module.exports = socketsSetup
+export default socketsSetup

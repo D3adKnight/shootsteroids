@@ -8,36 +8,43 @@
     "type": "git",
     "url": "https://github.com/D3adKnight/shootsteroids.git"
   },
-  "babel": {
-    "presets": [
-      "latest"
-    ]
-  },
   "scripts": {
-    "start": "node main.js",
-    "start:dev": "node --debug main.js",
-    "build-dev": "gulp build-debug",
-    "build": "gulp build",
-    "test": "gulp test"
+    "start": "npm run dev:start",
+    "dev:start": "nodemon --ignore lib --ignore dist --exec babel-node src/server",
+    "dev:wds": "webpack-dev-server --progress",
+    "prod:build": "rimraf lib dist && babel src -d lib --ignore .test.js && cross-env NODE_ENV=production webpack -p --progress",
+    "lint": "eslint src webpack.config.babel.js --ext .js",
+    "test": "npm run lint && flow && jest --coverage",
+    "precommit": "npm test",
+    "prepush": "npm run prod:build"
   },
   "dependencies": {
-    "ejs": "^2.5.2",
+    "babel-polyfill": "^6.23.0",
+    "compression": "^1.6.2",
     "express": "^4.14.0",
-    "socket.io": "^1.6.0"
+    "socket.io": "^1.7.3",
+    "socket.io-client": "^1.7.3"
   },
   "devDependencies": {
-    "babel-preset-latest": "^6.16.0",
-    "babelify": "^7.3.0",
-    "browserify": "latest",
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.24.0",
+    "babel-eslint": "^7.1.1",
+    "babel-jest": "^19.0.0",
+    "babel-loader": "^6.4.0",
+    "babel-preset-env": "^1.2.1",
+    "babel-preset-flow": "^6.23.0",
+    "cross-env": "^3.2.4",
+    "eslint": "^3.17.1",
     "eslint-config-standard": "^6.2.1",
+    "eslint-plugin-flowtype": "^2.30.3",
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^2.0.1",
-    "gulp": "latest",
-    "gulp-eslint": "^3.0.1",
-    "gulp-mocha": "^3.0.1",
-    "gulp-nodemon": "^2.2.1",
-    "gulp-util": "^3.0.7",
-    "mocha": "^3.2.0",
-    "vinyl-source-stream": "latest"
+    "flow-bin": "^0.41.0",
+    "husky": "^0.13.2",
+    "jest": "^19.0.2",
+    "nodemon": "^1.11.0",
+    "rimraf": "^2.6.1",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.4.2"
   }
 }
